@@ -1,12 +1,14 @@
-import './App.css'
+import Menu from "./Menu";
+import TitleBar from "./TitleBar";
 
 function App() {
 
-  return (
-      <div>
-        Hello from React!
-      </div>
-  )
+    return (
+        <>
+            <TitleBar />
+            <Menu />
+        </>
+    )
 }
 
 export default App
