@@ -1,14 +1,20 @@
+import { useState } from 'react';
+import { ChevronLeftIcon, PlusIcon } from '@heroicons/react/24/solid';
+
 import YearTab from './YearTab';
 
 function Menu() {
+    const [isFullSize, setIsFullSize] = useState(true);
+
     return (
-        <div className="bg-gray-100 h-full w-2/5 rounded-2xl p-5 pr-1 flex items-start justify-between">
-        <div className = "w-11/12">
-            <YearTab year = {2024} />
-        </div>
-            <svg className="h-3 w-3  self-center rotate-270" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 490">
-            <polygon points="245,456.701 490,33.299 0,33.299" fill='#4d4d4d'/>
-            </svg>
+        <div className={`bg-gray-100 h-full rounded-2xl p-5 flex flex-col items-start ${isFullSize ? 'w-2/5' : 'w-24'}`}>
+            <div className={`w-full flex flex-row ${isFullSize? "justify-end" : "justify-center"} mb-2`}>
+                {isFullSize && <PlusIcon  className="w-4 h-4 text-gray-600 " />}
+                <ChevronLeftIcon onClick = {() => setIsFullSize(!isFullSize)} className={`w-4 h-4 text-gray-600 ${isFullSize ? '' : 'rotate-180'}`} />
+            </div>
+            <div className = "w-full">
+                <YearTab isFullSize = {isFullSize} year = {2024} />
+            </div>
         </div>
     )
 }

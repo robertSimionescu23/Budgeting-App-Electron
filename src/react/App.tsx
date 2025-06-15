@@ -6,7 +6,11 @@ function App() {
     return (
         <>
             <TitleBar />
-            <Menu />
+
+            <div className="h-full flex flex-row">
+                <Menu />
+                <div className="h-full w-full mx-5 rounded-md"></div>
+            </div>
         </>
     )
 }
