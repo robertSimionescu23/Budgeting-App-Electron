@@ -21,6 +21,14 @@ rules.push({
   ],
 });
 
+// rules.push({
+//   test: /\.(woff|woff2|eot|ttf|otf)$/i,
+//   type: 'asset/resource',
+
+// });
+
+
+
 export const rendererConfig: Configuration = {
   module: {
     rules,

@@ -16,13 +16,21 @@ function Menu() {
             <div className = "w-full">
                 <YearTab isFullSize = {isFullSize} year = {2024} />
             </div>
-            {chooseYear && <div onClick = {() => setChooseYear(false)}className = {"z-2 absolute inset-0 bg-gray-500 w-full h-full opacity-20"}></div>}
-            {chooseYear && <div className='absolute inset-1/2 w-1/2 h-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-100 z-3 rounded-md flex flex-row items-center justify-between px-40'>
-               {/* Add a Calendar */}
-                <div>12</div>
-                <div>Aug</div>
-                <div>2024</div>
-            </div>}
+            {chooseYear && <div onClick = {() => setChooseYear(false)} className = {"z-2 absolute inset-0 bg-gray-500 w-full h-full opacity-20"}></div>}
+            {chooseYear &&
+            <div className='font-zain text-gray-800 text-lg pt-4 absolute inset-1/2 w-1/2 h-1/2 -translate-x-1/2 -translate-y-1/2 bg-white z-3 rounded-md flex flex-col items-center '>
+                <div className='w-fit text-nowrap'> Add an entry manually</div>
+                <div className = "font-zain text-xl text-gray-800 m-4 w-2/3 px-4 h-10 bg-gray-100 opacity-90 flex flex-row items-center justify-between text-center rounded-md">
+                    <input className='w-12 text-gray-800 cursor-pointer text-center' placeholder = "dd"/>
+                    <div>/</div>
+                    <input className='w-12 text-gray-800 cursor-pointer text-center' placeholder = "mm"/>
+                    <div>/</div>
+                    <input className='w-12 text-gray-800 cursor-pointer text-center' placeholder = "yyyy"/>
+                    {/* <div className='text-gray-400 cursor-pointer'>mm</div>
+                    <div className='text-gray-400 cursor-pointer'>yyyy</div> */}
+                </div>
+            </div>
+            }
         </div>
     )
 }
