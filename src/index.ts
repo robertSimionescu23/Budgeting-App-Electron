@@ -58,8 +58,20 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-ipcMain.handle('save-json', async (event, filename: string, data: { day: string; month: string; year: string }) => {
-    const filePath = path.join(app.getAppPath(), filename);
+ipcMain.handle('save-json', async (event, filename: string, data: any) => {
+
+    const basePath = app.getPath('userData');
+    const folderPath = path.join(basePath, "reportDataJSON");
+    const filePath = path.join(folderPath, filename);
+
+    if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath);
+    }
+
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
     return filePath;
+});
+
+ipcMain.handle('get-user-data-path', () => {
+    return path.join(app.getPath('userData'), "reportDataJSON");
 });
