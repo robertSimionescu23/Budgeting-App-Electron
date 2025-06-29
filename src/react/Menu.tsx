@@ -1,65 +1,52 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
 import { ChevronLeftIcon,ChevronRightIcon, PlusIcon } from '@heroicons/react/24/solid';
 import YearTab from './YearTab';
 
-declare global {
-    interface Window {
-        electronAPI: {
-            saveJson: (filename: string, data: any) => Promise<string>;
-            getUserDataPath: () => Promise<string>;
-        };
-    }
-}
 
 function Menu() {
-    const [saveFolder, setSaveFolder] = useState<string>("");
     const sysDate = new Date();
+    const [currentDate, setCurrentDate] = useState(sysDate);
 
-    const yearString  = String(sysDate.getFullYear());
-    const monthString = String(sysDate.getMonth() + 1).padStart(2, '0');
-    const dayString   = String(sysDate.getDate()).padStart(2, '0');
+    const [yearsToRefresh, setYearsToRefresh] = useState<Record<number, boolean>>({});
 
-    const [currentEntry, setCurrentEntry] = useState<{ day: string; month: string; year: string }>({
-        day: dayString,
-        month: monthString,
-        year: yearString
-    });
+    const toggleYear = (year: number) => { //Add an array for keeping track of what year needs a refresh
+        setYearsToRefresh(prev => ({
+            ...prev,
+            [year]: !prev[year],
+        }));
+    };
 
     const [isFullSize, setIsFullSize] = useState(true);
     const [chooseYear, setChooseYear] = useState(false);
     const [yearTabs, setYearTabs] = useState<number[]>([]);
 
+    useEffect(() => {
+        window.electronAPI.getSubmittedYears().then((years: number[]) => {
+            setYearTabs(years.sort((a, b) => a - b));
+        });
+    }, []);
 
-    async function saveAllYearTabs() {
-        for (const year of yearTabs) {
-            const data = { year };
-            const filename = `year_${year}.json`;
-            await window.electronAPI.saveJson(filename, data);
-        }
-    }
+
 
     function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        console.log(`Saved year tabs: ${saveFolder}`);
         setChooseYear(false);
         setYearTabs(prev => {
-            const newYear = parseInt(currentEntry.year);
+            const newYear = currentDate.getFullYear();
             if (!prev.includes(newYear)) {
                 return [...prev, newYear].sort((a, b) => a - b);
             }
             return prev;
         });
-        setCurrentEntry({ day: dayString, month: monthString, year: yearString });
+        const data = [{
+                date: currentDate.toISOString().split('T')[0],
+                amount: 0,
+                category: "test",
+            }];
+        window.electronAPI.saveJson(currentDate.getFullYear(), data);
+        setCurrentDate(sysDate);
+        toggleYear(currentDate.getFullYear()); //Toggle a refresh when data is added to the year. It will do nothing if the year tab is not maximised
     }
 
-    // Effect to run after yearTabs changes
-    useEffect(() => {
-        saveAllYearTabs();
-    }, [yearTabs]);
-
-    useEffect(() => {
-        window.electronAPI.getUserDataPath().then(setSaveFolder); //All IPC calls are promises. I need to wait for them to resolve
-    }, []);
 
     return (
         <div className={`bg-gray-100 h-full rounded-2xl p-5 flex flex-col items-start ${isFullSize ? 'w-2/5' : 'w-24'}`}>
@@ -69,10 +56,16 @@ function Menu() {
             </div>
             <div className = "w-full">
                     {yearTabs.map(year => (
-                        <YearTab key={year} isFullSize={isFullSize} year={year} />
+                        <YearTab
+                         key={year}
+                         isFullSize={isFullSize}
+                         year={year}
+                         needsRefresh = {!!yearsToRefresh[year]}
+                         toggleRefresh = {() => toggleYear(year)}
+                         />
                     ))}
             </div>
-            {chooseYear && <div onClick = {() => {setChooseYear(false); setCurrentEntry({day: dayString, month: monthString, year: yearString})}} className = {"z-2 absolute inset-0 bg-gray-500 w-full h-full opacity-20"}></div>}
+            {chooseYear && <div onClick = {() => {setChooseYear(false); setCurrentDate(sysDate)}} className = {"z-2 absolute inset-0 bg-gray-500 w-full h-full opacity-20"}></div>}
             {chooseYear &&
             <div className='font-zain text-gray-800 text-lg pt-4 absolute inset-1/2 w-1/2 h-1/2 -translate-x-1/2 -translate-y-1/2 bg-white z-3 rounded-md flex flex-col items-center '>
                 <div className='w-fit text-nowrap'> Add a n entry manually</div>
@@ -81,18 +74,14 @@ function Menu() {
                 >
                     <input className={`mx-auto text-gray-800 self-center cursor-pointer text-center`}
                         type = "date"
-                        value={currentEntry.year + '-' + currentEntry.month + '-' + currentEntry.day}
+                        value={currentDate.toISOString().split('T')[0]}
                         onChange={(e)=>{
-                            const day: string = e.target.value.split('-')[2];
-                            const month: string = e.target.value.split('-')[1];
-                            const year: string = e.target.value.split('-')[0];
-
-                            setCurrentEntry({ day, month, year });
+                            setCurrentDate(new Date(e.target.value));
                         }}
                     />
                     <button className='h-full w-12 bg-green-200 cursor-pointer flex items-center justify-center rounded-r-md self-end'
                         type = "submit"
-                    ><ChevronRightIcon onClick = {() => setIsFullSize(!isFullSize)} className={`w-4 h-4 text-gray-800 cursor-pointer ${isFullSize ? '' : 'rotate-180'}`} /></button>
+                    ><ChevronRightIcon  className={`w-4 h-4 text-gray-800 cursor-pointer`} /></button>
                 </form>
             </div>
             }
