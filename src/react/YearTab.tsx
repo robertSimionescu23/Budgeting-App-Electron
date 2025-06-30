@@ -4,10 +4,12 @@ import type { BudgetEntry } from '../InterfaceBudgetEntry';
 // TODO: Add a way to choose colors for year tabs and month tabs
 function YearTab({ year, isFullSize, needsRefresh, toggleRefresh } :{year: number; isFullSize: boolean; needsRefresh: boolean; toggleRefresh: () => void}) {
                                      // Add a way to trigger a refresh from the parent component, for whe nwe are adding an element while the year tab is maximized
+
     const [isSelected, setIsSelected] = useState(false);
     const [monthList, setMonthList] = useState<string[]>([]);
     const [report, setReport] = useState<BudgetEntry[]>(null);
 
+    const [dayList, setDayList] = useState<Record<string, BudgetEntry[]>>({});
 
     useEffect(() => {
         if ((isSelected && report == null) || (needsRefresh && isSelected)) {
@@ -24,24 +26,13 @@ function YearTab({ year, isFullSize, needsRefresh, toggleRefresh } :{year: numbe
                 new Set(report.map((entry: BudgetEntry) => entry.date.split('-')[1])) //Convert to Set to remove duplicate values with new Set. Use Array.from to conver back to array.
             );
             monthList = monthList.sort((a, b) => parseInt(a) - parseInt(b)); //Sort months numerically (They are strings).
-            monthList = monthList.map(month => {
-                switch(month) { //Get the actual month names
-                    case '01': return 'January';
-                    case '02': return 'February';
-                    case '03': return 'March';
-                    case '04': return 'April';
-                    case '05': return 'May';
-                    case '06': return 'June';
-                    case '07': return 'July';
-                    case '08': return 'August';
-                    case '09': return 'September';
-                    case '10': return 'October';
-                    case '11': return 'November';
-                    case '12': return 'December';
-                    default: return month;
-                }
-            });
+
             setMonthList(monthList);
+
+            monthList.forEach(month => {
+                const entriesForMonth = report.filter(entry => entry.date && entry.date.split('-')[1] === month); //Get entries for the month
+                setDayList(prev => ({ ...prev, [month]: entriesForMonth })); //Set the dayList with the month as key and the entries as value
+            });
         }
     }, [report]);
 
@@ -51,7 +42,13 @@ function YearTab({ year, isFullSize, needsRefresh, toggleRefresh } :{year: numbe
                 {isFullSize? year : year.toString().slice(-2)}
             </div>
 
-            {isSelected && monthList.map(month => <MonthTab key={month} month = {month} isFullSize = {isFullSize}></MonthTab>)}
+            {isSelected && monthList.map(month =>
+            <MonthTab
+                key={month}
+                month = {month}
+                isFullSize = {isFullSize}
+                dayList = {dayList[month] || []}
+            ></MonthTab>)}
         </div>
     )
 }
