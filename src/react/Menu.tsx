@@ -44,7 +44,7 @@ function Menu() {
             }];
         window.electronAPI.saveJson(currentDate.getFullYear(), data);
         setCurrentDate(sysDate);
-        toggleYear(currentDate.getFullYear()); //Toggle a refresh when data is added to the year. It will do nothing if the year tab is not maximised
+        toggleYear(currentDate.getFullYear()); //Toggle a refresh when data is added to the year. It will do nothing if the year tab is not selected
     }
 
 
