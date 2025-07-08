@@ -74,8 +74,6 @@ ipcMain.handle('save-json', async (event, year: number, data: BudgetEntry[]) => 
     const filePath = path.join(folderPath, `year_${year}.json`);
 
     if(fs.existsSync(filePath)) {
-        console.log(`File ${filePath} already exists, appending data.`);
-
         const existingData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 
         if(Array.isArray(existingData)) existingData.push(...data);

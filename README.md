@@ -7,3 +7,5 @@ A budgeting desktop app that can create reports of spendings based on moths or y
 3. Add entries by report file
 4. Create pie chart of spendings with user defined percentage for each category
 
+TODOS:
+Rethink a way to update reports on submit. Update day and month tabs that are extended.
