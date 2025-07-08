@@ -76,7 +76,7 @@ function YearTab({
                     setIsExpanded(exp => !exp);
                     setSelected({ year });
                 }}
-                className={`font-zain select-none w-full h-12 rounded-md flex items-center mb-1 max-w-96 cursor-pointer bg-green-200 ${isFullSize ? "p-5" : "p-2 justify-center"} ${isSelected ? ' ring-3 ring-pink-400' : ''}`}
+                className={`font-zain select-none w-full h-12 rounded-md flex items-center mb-1 max-w-96 cursor-pointer text-2xl bg-green-200 ${isFullSize ? "p-5" : "p-2 justify-center"} ${isSelected ? ' ring-3 ring-pink-400' : ''}`}
             >
                 {isFullSize ? year : year.toString().slice(-2)}
             </div>

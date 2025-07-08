@@ -2,6 +2,7 @@ import type { BudgetEntry } from '../InterfaceBudgetEntry';
 
 function Display({data}: {data: BudgetEntry[] | null}) {
     return  (
+        //TODO: Displayt the data in a more user-friendly way
         <div className="h-full w-full mx-5 rounded-md">
             {Array.isArray(data) && data.length > 0 ? (
                 data.map((entry, idx) => (
@@ -10,7 +11,7 @@ function Display({data}: {data: BudgetEntry[] | null}) {
                     </div>
                 ))
             ) : (
-                <div className="text-gray-400 italic">No data</div>
+                <div></div>
             )}
         </div>
     )

@@ -4,6 +4,7 @@ import Display from "./Display";
 import {useState} from 'react';
 import { BudgetEntry } from "../InterfaceBudgetEntry";
 
+
 function App() {
 
     const [displayData, setDisplayData] = useState<BudgetEntry[]>(null);

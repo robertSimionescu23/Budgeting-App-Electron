@@ -2,7 +2,7 @@ import { useState, useEffect, useRef} from 'react';
 import { ChevronLeftIcon,ChevronRightIcon, PlusIcon } from '@heroicons/react/24/solid';
 import type { BudgetEntry } from '../InterfaceBudgetEntry';
 import YearTab from './YearTab';
-
+import BudgetTab from "./BudgetTab";
 
 function Menu ({setDisplayData}: {setDisplayData: (data: BudgetEntry[]) => void}) {
     //Current date
@@ -10,11 +10,12 @@ function Menu ({setDisplayData}: {setDisplayData: (data: BudgetEntry[]) => void}
 
     //State varaibles
     const [addedDate     , setAddedDate]          = useState(sysDate);
+    const [addedEntryData, setAddedEntryData]     = useState<{amount: number, category: string, description?: string}>({amount: 0, category: "test"});
     const [yearsToRefresh, setYearsToRefresh]     = useState<Record<number, boolean>>({});
     const [isFullSize    , setIsFullSize]         = useState(true);
     const [showAddTab    , setShowAddTab]         = useState(false);
     const [yearTabs      , setYearTabs]           = useState<number[]>([]);
-    type SelectedType = { year: number; month?: string; day?: string } | null;
+    type  SelectedType = { year: number; month?: string; day?: string } | null;
     const [selected, setSelected] = useState<SelectedType>(null);
 
     const toggleRefreshForYear = (year: number) => {
@@ -49,8 +50,8 @@ function Menu ({setDisplayData}: {setDisplayData: (data: BudgetEntry[]) => void}
 
         const data = [{
                 date: addedDate.toISOString().split('T')[0], //The date object is formated like "1970-01-01T00:00:00.000Z". By calling this, we can get the date in YYYY-MM-DD format
-                amount: 0,        //TODO: Add amount handling
-                category: "test", //TODO: Add category handling
+                amount: addedEntryData.amount,        //TODO: Add amount handling
+                category: addedEntryData.category, //TODO: Add category handling
             }];
         window.electronAPI.saveJson(addedDate.getFullYear(), data); //Save to the sava data JSON
 
@@ -73,6 +74,12 @@ function Menu ({setDisplayData}: {setDisplayData: (data: BudgetEntry[]) => void}
                     className={`w-4 h-4 text-gray-600 cursor-pointer ${isFullSize ? '' : 'rotate-180'}`}
                 />
             </div>
+            <BudgetTab
+                isFullSize={isFullSize}
+                selected={selected}
+                setSelected={setSelected}
+                setDisplayData={setDisplayData}
+            />
             <div className = "w-full">
                     {yearTabs.map(year => (
                         <YearTab
@@ -95,22 +102,51 @@ function Menu ({setDisplayData}: {setDisplayData: (data: BudgetEntry[]) => void}
             </div>}
 
             {showAddTab &&
-            <div className='font-zain text-gray-800 text-lg pt-4 absolute inset-1/2 w-1/2 h-1/2 -translate-x-1/2 -translate-y-1/2 bg-white z-3 rounded-md flex flex-col items-center '>
-                <div className='w-fit text-nowrap'> Add an entry manually</div>
-                <form className = "font-zain text-xl text-gray-800 m-4 w-2/3 h-10 bg-gray-100 opacity-90 flex flex-row items-center justify-between text-center rounded-md"
+            <div className='font-zain text-gray-800 text-lg pt-4 absolute inset-1/2 lg:w-1/2 md:w-120 sm: w-80 h-1/2 -translate-x-1/2 -translate-y-1/2 bg-white z-3 rounded-md flex flex-col items-center '>
+                <div className='w-fit text-nowrap text-3xl'> Add an entry manually</div>
+                <form
+                    className="font-zain text-xl text-gray-800 m-4 w-2/3  flex flex-col items-center text-center "
                     onSubmit={handleSubmit}
                 >
-                    <input className={`mx-auto text-gray-800 self-center cursor-pointer text-center`}
-                        type = "date"
-                         value={addedDate.toISOString().split('T')[0]}
-                        onChange={(e)=>{
-                            setAddedDate(new Date(e.target.value));
-                        }}
-                    />
-                    <button className='h-full w-12 bg-green-200 cursor-pointer flex items-center justify-center rounded-r-md self-end'
-                        type = "submit"
-                    >
-                    <ChevronRightIcon  className={`w-4 h-4 text-gray-800 cursor-pointer`} /></button>
+                    <div className="w-full  h-10 flex flex-row items-center justify-between  bg-gray-100 opacity-90 rounded-md ring-2 ring-gray-400">
+                        <input
+                            className="text-2xl mx-auto text-gray-800 self-center cursor-pointer text-center "
+                            type="date"
+                            value={addedDate.toISOString().split('T')[0]}
+                            onChange={e => setAddedDate(new Date(e.target.value))}
+                        />
+                        <button
+                            className="h-full w-12 bg-green-200 cursor-pointer flex items-center justify-center rounded-r-md self-end p-1"
+                            type="submit"
+                        >
+                            <ChevronRightIcon className="w-6 h-6 text-gray-800 cursor-pointer" />
+                        </button>
+                    </div>
+                    <div className="my-2 w-full flex flex-col lg:flex-row items-center justify-between ">
+                        <div className='flex flex-col lg:flex-row'>
+                            <div className="text-2xl lg:mr-6 ">Amount</div>
+                            <input
+                                className="lg:mr-6 w-15 text-gray-800 self-center cursor-pointer text-center bg-gray-100 opacity-90 rounded-md ring-2 ring-gray-400"
+                                type="number"
+                                value={addedEntryData.amount > 0? addedEntryData.amount : ''}
+                                onChange={e => setAddedEntryData(prev => ({
+                                  ...prev,
+                                  amount: Number(e.target.value)
+                                }))}
+                            />
+                        </div>
+                        <div className = "flex flex-col lg:flex-row ">
+                            <div className="text-2xl lg:mr-6">Category</div>
+                            <input
+                                className="lg:mr-6 w-25 text-gray-800 self-center cursor-pointer text-center bg-gray-100 opacity-90 rounded-md ring-2 ring-gray-400"
+                                type="text"
+                                onChange={e => setAddedEntryData(prev => ({
+                                  ...prev,
+                                  category: String(e.target.value)
+                                }))}
+                                />
+                        </div>
+                    </div>
                 </form>
             </div>
             }

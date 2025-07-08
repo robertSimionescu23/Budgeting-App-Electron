@@ -3,6 +3,7 @@ import type { BudgetEntry } from '../InterfaceBudgetEntry';
 import DayTab from './DayTab';
 
 type SelectedType = { year: number; month?: string; day?: string } | null;
+
 function MonthTab({
   month,
   isFullSize,
